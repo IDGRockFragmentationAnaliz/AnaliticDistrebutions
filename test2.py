@@ -10,10 +10,11 @@ from sage.combinat.q_analogues import q_factorial
 from sage.combinat.q_analogues import q_pochhammer
 
 
+
 def main():
-    a = 0.1
-    n_max = 40
-    t = 50
+    a = 1
+    n_max = 20
+    t = 100
     q = 2 ** (-a)
     c = np.zeros((n_max+1, 1))
 
@@ -22,8 +23,41 @@ def main():
 
     s = np.sum(c)
     print(s)
-    plt.plot(c)
+
+    #mu = np.log(a*t)/(a*np.log(2))
+
+    mu = get_d(1, 1, q)
+    print(mu)
+    exit()
+    plt.plot([mu, mu],[0, np.max(c)],color="r")
+    plt.plot(c,color="black")
     plt.show()
+
+
+def get_mu(q, tau):
+    sumK1 = 0
+    sumK2 = 0
+    for k in range(100):
+        q_poch = q_pochhammer(Integer(k), RealNumber(q), RealNumber(q))
+        dsum = np.exp(-(q**k)*tau)/q_poch
+        sumK1 += dsum
+        sumK2 += k*dsum
+    print(sumK1, sumK2)
+
+
+def get_u(i, q, m_max=100):
+    result = 0
+    for m in range(m_max):
+        qp = q_pochhammer(Integer(m), RealNumber(q), RealNumber(q))
+        result += (-1)**m * q**((m-1)*m/2)/qp * (m**i)
+    return result
+
+def get_d(k, i, q):
+    bin = binomial_coefficients(i)
+    result = 0
+    for s in range(i):
+        result += (bin[(i, s)]*(k**(i - s))*get_u(s, q))
+    return result
 
 
 def get_cn(n, t, q):
